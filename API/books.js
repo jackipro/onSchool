@@ -33,4 +33,40 @@ router.get("/:id", (req, res) => {
     });
   });
 });
+router.post("/", (req, res) => {
+  var newBook = req.body;
+  MongoClient.connect(url, (err, db) => {
+    if (err) throw err;
+    console.log("Data created");
+    var dbo = db.db("test");
+    dbo.collection("book").insertOne(newBook, (error, result) => {
+      if (error) throw error;
+      var kq = false;
+      if (result.insertedCount > 0) {
+        kq = true;
+      }
+      console.log(kq);
+      res.json(kq);
+    });
+  });
+});
+
+router.delete("/:id", (req, res) => {
+  var id = req.params.id;
+  MongoClient.connect(url, (err, db) => {
+    if (err) throw err;
+    var dbo = db.db("test");
+    var ObjectId = require("mongodb").ObjectId;
+    var query = { _id: ObjectId(id) };
+    dbo.collection("book").deleteOne(query, (err, result) => {
+      if (err) throw err;
+      var kq = false;
+      if (result.result.n > 0) {
+        kq = true;
+        console.log(kq);
+        res.json(kq);
+      }
+    });
+  });
+});
 module.exports = router;
